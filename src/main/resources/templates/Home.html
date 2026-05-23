@@ -1,0 +1,621 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost2Found - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .hero {
+            background:
+                    linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)),
+                    url('/images/Own2.png') left center no-repeat,   /* 👈 left image */
+                    url('/images/Own.png') right center no-repeat;  /* 👉 right image */
+
+            background-size: 362px auto, 450px auto; /* size for both images */
+            color: white;
+            text-align: center;
+            padding: 120px 20px;
+            min-height: 300px;
+        }
+        .hero .content {
+            margin-left: 435px;  /* adjust based on image width */
+            margin-right: 400px; /* optional → keeps text from overlapping right image */
+            color: black;
+        }
+
+
+        .custom-btn {
+             padding: 8px 18px;   /* adjust height & width */
+             font-size: 14px;     /* text size */
+             border-radius: 8px;  /* corner rounding */
+         }
+
+
+
+    .section-title {
+            margin-bottom: 30px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        footer {
+            background: #212529;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+        #registerBtn {
+            margin-right: 15px;
+            background-color: #007bff; /* Bootstrap blue */
+            border-color: #007bff;
+            color: white;
+        }
+        #registerBtn:hover {
+            background-color: #0056b3; /* darker blue on hover */
+            border-color: #004085;
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+
+<!-- 🔹 Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <img src="/images/logo.png"  alt="Logo" width="220" height="40">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#overview">Overview</a></li>
+                <li class="nav-item"><a class="nav-link" href="#how">How it Works</a></li>
+                <li class="nav-item"><a class="nav-link" href="#about">About Us</a></li>
+                <a href="/register" class="btn btn-success custom-btn" id="registerBtn">Register</a>
+
+                <a href="/login" class="btn btn-success custom-btn" id="loginBtn">Login</a>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 🔹 Hero Section -->
+<section class="hero">
+    <div class="content">
+    <h1 class="display-4 fw-bold">Welcome to Lost2Found</h1>
+    <p class="lead">Connecting people to find and return lost items with ease.</p>
+    </div>
+    <a href="#register" class="btn btn-lg btn-warning mt-3">Get Started</a>
+
+</section>
+
+<!-- 🔹 Website Overview -->
+<section id="overview" class="container my-5 py-5">
+    <div class="text-center mb-5">
+        <h2 class="display-4 fw-bold">Lost2Found: Your Smart Lost & Found Solution</h2>
+        <p class="lead text-muted mt-3">
+            Lost2Found is a digital platform designed to address the common challenge of misplacing belongings in various environments.
+            Traditional methods like notice boards, registers, or word-of-mouth are often slow and inefficient.
+            Our platform provides a modern, streamlined solution for reporting, tracking, and recovering lost or found items.
+        </p>
+    </div>
+
+    <div class="row g-4 text-center">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Digital Reporting</h5>
+                    <p class="card-text text-muted">
+                        Users can easily report lost or found items with complete details like title, description, location, date, and optional images.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">AI-Powered Matching</h5>
+                    <p class="card-text text-muted">
+                        Our intelligent AI engine automatically suggests potential matches between reports, minimizing human effort and maximizing accuracy.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Enhanced Trust & Transparency</h5>
+                    <p class="card-text text-muted">
+                        The platform is designed to be secure and reliable, with an admin verification module that ensures system integrity and reduces false claims.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Improved Recovery</h5>
+                    <p class="card-text text-muted">
+                        By providing a secure, structured, and user-friendly platform, we significantly enhance the chances of item recovery.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 🔹 How it Works -->
+<section id="how" class="container my-5">
+    <h2 class="section-title">How It Works</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <h5>1. Register & Login</h5>
+                <p>Create your free account and login to start using the platform.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <h5>2. Report Lost/Found</h5>
+                <p>Easily submit details of lost or found items with images and Description.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <h5>3. Connect & Return</h5>
+                <p>We connect finders and owners securely to ensure safe return.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 🔹 About Us -->
+<section id="about" class="bg-light py-5">
+    <div class="container">
+        <h2 class="section-title text-center mb-4">About Us</h2>
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <p class="lead mb-4">
+                    Lost2Found was born from a simple but common problem: the frustration of losing a valuable item and the inefficiency of outdated lost-and-found systems. We saw that traditional methods—like dusty registers and forgotten notice boards—were simply not working in our fast-paced world. This led us to ask: what if we could use technology to make this process smarter, faster, and more reliable?
+                </p>
+                <p>
+                    Our mission is to bridge the gap between those who lose an item and those who find it. We've built an intelligent, user-friendly platform that replaces manual effort with the power of technology. The heart of our system is an <b>AI-powered Matching Engine</b> that intelligently analyzes reports to suggest potential matches, significantly increasing the chances of a successful recovery.
+                </p>
+                <p class="mt-4">
+                    We are a team of students from <b>Medicaps University</b> who are passionate about creating a solution that is not only effective but also built on principles of trust and transparency. We believe in the power of community to help one another, and <b><i>Lost2Found</i></b> is our way of making that happen. We are committed to providing a secure and reliable platform that helps you find what you've lost and gives you peace of mind.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 🔹 Register -->
+<section id="register" class="container my-5 text-center">
+    <h2 class="section-title">Join Us Today</h2>
+    <p>Register now and become part of the Lost2Found community.</p>
+    <a href="/register"> <button id="joinRegisterBtn" class="btn btn-success btn-lg" >Register</button></a>
+    <div id="join-message" class="mt-3 fw-bold"></div>
+</section>
+
+
+<!-- Contact Us Section -->
+<section id="contact" class="container my-4 py-2">
+    <div class="row">
+        <div class="col-lg-6">
+            <h2 class="section-title text-center mb-4">Contact Us</h2>
+            <!-- Added id="contactForm" -->
+            <form id="contactForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="name" placeholder="Enter your name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" rows="4" placeholder="Your message..." required></textarea>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-warning">Send Message</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- EmailJS Script -->
+
+        <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+        <script>
+            // Initialize EmailJS with your Public Key
+            (function() {
+                emailjs.init("oh6yxOh85Tudkj4OI");  // Replace with your actual public key
+            })();
+
+            // Handle form submission
+            document.querySelector("#contactForm").addEventListener("submit", function(e) {
+                e.preventDefault();
+
+                const name = document.getElementById("name").value;
+                const email = document.getElementById("email").value;
+                const message = document.getElementById("message").value;
+
+                const params = {
+                    from_name: name,
+                    from_email: email,
+                    reply_to: email,
+                    message: message
+                };
+
+                emailjs.send("service_3a38k1b", "template_diqknjc", params)
+                    .then(function(response) {
+                        alert("✅ Message sent successfully!");
+                        document.getElementById("contactForm").reset();
+                        console.log(params);
+                    }, function(error) {
+                        console.error("❌ FAILED...", error);
+                        alert("❌ Failed to send message. Please try again later.");
+                    });
+            });
+        </script>
+
+
+
+        <div class="col-lg-6 mt-5 mt-lg-0 d-flex flex-column justify-content-center">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm p-3">
+                        <div class="card-body">
+                            <h4 class="card-title mb-3">Quick Links</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-dark">Home</a></li>
+                                <li class="mb-2"><a href="#overview" class="text-decoration-none text-dark">Overview & Features</a></li>
+                                <li class="mb-2"><a href="#about" class="text-decoration-none text-dark">About Us</a></li>
+                                <!-- Trigger Modal -->
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#infoModal" data-tab="faqs">FAQs</a></li>
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#infoModal" data-tab="terms">Terms of Service</a></li>
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#infoModal" data-tab="privacy">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm p-3">
+                        <div class="card-body">
+                            <h4 class="card-title mb-3">Support</h4>
+                            <p>
+                                <a href="#"
+                                   class="text-decoration-none text-dark"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#infoModal"
+                                   data-tab="help">Help Center</a>
+                            </p>
+
+
+                            <h4 class="card-title mt-4 mb-3">Follow Us</h4>
+                            <a href="https://www.instagram.com/mr_ayaj_786?igsh=MTNmZXR5Zjg5MXo1dA=="
+                               target="_blank"
+                               class="me-3 instagram-icon"
+                               title="Follow me on Instagram">
+                                <i class="bi bi-instagram fs-4"></i>
+                            </a>
+                            <a href="https://wa.me/+918827321609?text=Hello%20Lost2Found%20Team!"
+                               target="_blank"
+                               class="me-3 whatsapp-icon"
+                               title="Chat with us on WhatsApp">
+                                <i class="bi bi-whatsapp fs-4"></i>
+                            </a>
+
+                            <style>
+                                .instagram-icon i {
+                                    background: radial-gradient(circle at 30% 107%,
+                                    #fdf497 0%,
+                                    #fdf497 5%,
+                                    #fd5949 45%,
+                                    #d6249f 60%,
+                                    #285AEB 90%);
+                                    -webkit-background-clip: text;
+                                    -webkit-text-fill-color: transparent;
+                                    transition: transform 0.3s ease;
+                                }
+
+                                .whatsapp-icon i {
+                                    color: #25D366;
+                                    transition: transform 0.3s ease;
+                                }
+
+                                .instagram-icon:hover i,
+                                .whatsapp-icon:hover i {
+                                    transform: scale(1.2);
+                                }
+
+                                /* Remove any unwanted underline or pseudo-elements */
+                                a {
+                                    text-decoration: none !important;
+                                }
+                            </style>
+
+
+                            <!-- Location Icon -->
+                            <a href="#"
+                               class="me-3 location-icon"
+                               data-bs-toggle="modal"
+                               data-bs-target="#mapModal"
+                               title="View Location on Map">
+                                <i class="bi bi-geo-alt fs-4"></i>
+                            </a>
+
+                            <a href="https://www.linkedin.com/in/mo-aayaj-mansuri-259570306?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+                               target="_blank"
+                               class="text-primary me-3"
+                               title="Visit my LinkedIn">
+                                <i class="bi bi-linkedin fs-4"></i>
+                            </a>
+
+                            <a href="https://teams.microsoft.com/l/chat/0/0?users=ayajmansuri94@gmail.com"
+                               target="_blank"
+                               class="teams-icon"
+                               title="Message me on Microsoft Teams">
+                                <i class="bi bi-microsoft-teams fs-4"></i>
+                            </a>
+
+                            <style>
+                                .teams-icon i {
+                                    color: #6264A7; /* Microsoft Teams blue */
+                                    transition: transform 0.3s ease;
+                                }
+                                .teams-icon:hover i {
+                                    transform: scale(1.2);
+                                }
+                            </style>
+
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- 🔹 Bootstrap Modal with Tabs -->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalLabel">Information & Help Center</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="infoTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="faqs-tab" data-bs-toggle="tab" data-bs-target="#faqs" type="button" role="tab">FAQs</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="terms-tab" data-bs-toggle="tab" data-bs-target="#terms" type="button" role="tab">Terms Of Service</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="privacy-tab" data-bs-toggle="tab" data-bs-target="#privacy" type="button" role="tab">Privacy Policy </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="help-tab" data-bs-toggle="tab" data-bs-target="#help" type="button" role="tab">Help Center</button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content mt-3">
+
+                    <!-- FAQs -->
+                    <div class="tab-pane fade show active" id="faqs" role="tabpanel">
+                        <h5>Frequently Asked Questions</h5>
+                        <div class="accordion" id="faqAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq1">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                        Q1: How does Lost2Found work?
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Users can report a lost or found item by providing details such as item name, description, date, location, and image. Our AI-powered matching engine suggests possible matches.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq2">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        Q2: Do I need to create an account?
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Yes, creating an account helps you track your reports and connect with the right person.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq3">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                        Q3: Is Lost2Found free to use?
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Yes, it’s completely free.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq4">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                                        Q4: Can I delete my report?
+                                    </button>
+                                </h2>
+                                <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="faq4" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Yes, you can update or delete your report anytime from your profile.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Terms -->
+                    <div class="tab-pane fade" id="terms" role="tabpanel">
+                        <h5>Terms of Service</h5>
+                        <p>By using Lost2Found, you agree to:</p>
+                        <ul>
+                            <li>Provide accurate information when reporting items.</li>
+                            <li>Not misuse the platform with false or offensive reports.</li>
+                            <li>Respect all other users during communication.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Privacy -->
+                    <div class="tab-pane fade" id="privacy" role="tabpanel">
+                        <h5>Privacy Policy</h5>
+                        <ul>
+                            <li>We only collect necessary details such as name, email, and contact number.</li>
+                            <li>Your personal information is never shared publicly.</li>
+                            <li>Data is securely stored and encrypted.</li>
+                            <li>You can request deletion of your data anytime.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Help Center -->
+                    <div class="tab-pane fade" id="help" role="tabpanel">
+                        <h5>Help Center</h5>
+                        <p>Watch our step-by-step tutorials to get started with Lost2Found:</p>
+
+                        <!-- Video 1 -->
+                        <div class="mb-4">
+                            <b>📌 How to Register:</b>
+                            <video width="100%" height="auto" controls>
+                                <source src="/videos/Register.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+
+
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 🔹 Footer -->
+<footer>
+    <p>© 2025 Lost2Found | All Rights Reserved</p>
+</footer>
+
+<!-- Google Map Modal -->
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#DB4437; color:white;">
+                <h5 class="modal-title" id="mapModalLabel">Medi-Caps University</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe
+                        src="https://www.google.com/maps?q=Medi-Caps+University,+Indore,+Madhya+Pradesh&output=embed"
+                        width="100%"
+                        height="450"
+                        style="border:0;"
+                        allowfullscreen
+                        loading="lazy">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .google-location-icon i {
+        position: relative;
+        display: inline-block;
+        color: #DB4437;
+        transition: transform 0.3s ease;
+    }
+    .google-location-icon i::after {
+        content: '';
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        width: 6px;
+        height: 6px;
+        background: white;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .google-location-icon:hover i {
+        transform: translateY(-3px) scale(1.2);
+        filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+    }
+</style>
+<script>
+    // Listen for the modal show event
+    const infoModal = document.getElementById('infoModal');
+    infoModal.addEventListener('show.bs.modal', function (event) {
+        // Get the button that triggered the modal
+        const button = event.relatedTarget;
+        if (!button) return; // safety check
+
+        // Get the data-tab attribute
+        const tabName = button.getAttribute('data-tab');
+        if (!tabName) return;
+
+        // Activate the corresponding tab
+        const tabTriggerEl = document.querySelector(`#infoTabs button[data-bs-target="#${tabName}"]`);
+        if (tabTriggerEl) {
+            const tab = new bootstrap.Tab(tabTriggerEl);
+            tab.show();
+        }
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

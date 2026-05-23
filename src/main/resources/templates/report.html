@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Lost/Found Item</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; }
+    footer { margin-top: auto; }
+    .action-buttons { display: flex; justify-content: center; gap: 50px; margin: 40px 0; }
+    .action-buttons button { width: 220px; height: 80px; font-size: 1.5rem; border-radius: 15px; color: white; border: none; transition: transform 0.2s; }
+    .action-buttons button:hover { transform: scale(1.05); }
+    .btn-lost { background-color: #dc3545; }
+    .btn-found { background-color: #198754; }
+    button.active {
+      box-shadow: 0 0 10px 2px #00000055;
+      transform: scale(1.08);
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/index">
+      <img src="/images/logo.png" alt="Logo" width="220" height="40">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/index">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/report">Report</a></li>
+        <li class="nav-item"><a class="nav-link" href="/search">Search</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="/matches">Matches</a></li>
+
+        <!-- Profile Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown"
+             role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="/images/Profile.png" alt="Profile" width="30" height="30" class="rounded-circle">
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="loadProfile()">My Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Lost / Found Buttons -->
+<div class="action-buttons">
+  <button id="lostBtn" class="btn-lost">Lost Item</button>
+  <button id="foundBtn" class="btn-found">Found Item</button>
+</div>
+
+<!-- Form Section -->
+<main class="container my-5">
+  <h2 class="text-center mb-4">Report Lost or Found Item</h2>
+
+  <form id="reportForm" class="row g-3 shadow p-4 rounded bg-light" enctype="multipart/form-data">
+    <!-- Hidden user_id input -->
+    <input type="hidden" name="user_id" id="user_id">
+
+    <div class="col-md-6">
+      <label class="form-label">Item Title</label>
+      <input type="text" name="title" class="form-control" required>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Location</label>
+      <input type="text" name="location" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Date</label>
+      <input type="date" name="event_date" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Contact Info</label>
+      <input type="text" name="contact_info" class="form-control">
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">Upload Image</label>
+      <input type="file" name="image" class="form-control">
+    </div>
+
+    <div class="col-12 text-center">
+      <button type="submit" class="btn btn-primary px-4">Submit Report</button>
+    </div>
+  </form>
+
+  <!-- Success Modal -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3 text-center">
+        <h5>Report Submitted Successfully!</h5>
+        <p>We will notify you when a match is found for your report.</p>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">My Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="profileDetails">
+          <p><strong>Username:</strong> <span id="profileUsername"></span></p>
+          <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+          <p><strong>Phone:</strong> <span id="profilePhone"></span></p>
+        </div>
+        <hr>
+        <h6>Update Password</h6>
+        <form id="updatePasswordForm">
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">New Password</label>
+            <input type="password" class="form-control" id="newPassword" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </form>
+        <div id="updateMessage" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-light text-center py-3">
+  <p>© 2025 Lost & Found</p>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  let selectedType = ''; // Lost or Found
+
+  // Fetch current user ID and set hidden input
+
+    // setUserId() — expected to return JSON { id: <long>, username:..., ... }
+  async function setUserId() {
+    try {
+      const res = await fetch('/profile/data');
+      if (!res.ok) {
+        console.error('❌ profile-data not OK', res.status);
+        return;
+      }
+
+      const user = await res.json();
+      if (user && user.id) {
+        document.getElementById('user_id').value = user.id;
+        console.log("✅ User ID set:", user.id);
+      } else {
+        console.warn('⚠️ profile-data returned no id', user);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', setUserId);
+    setUserId();
+
+    document.getElementById('reportForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if(!selectedType){ alert('Please click Lost or Found!'); return; }
+
+    const formData = new FormData(this);
+    const endpoint = selectedType === 'lost' ? '/api/items/report/lost' : '/api/items/report/found';
+
+    try {
+    const response = await fetch(endpoint, { method: 'POST', body: formData });
+
+    // handle JSON success or HTML error gracefully
+    const contentType = response.headers.get('content-type') || '';
+    let data;
+    if (contentType.includes('application/json')) {
+    data = await response.json();
+  } else {
+    // server responded with text/html or plain text (probably an error message)
+    const text = await response.text();
+
+    console.warn('non-json response:', text);
+    // Try parse JSON if possible
+    try { data = JSON.parse(text); } catch(_) { data = { success: response.ok, message: text }; }
+  }
+
+    if (data && data.success) {
+    const modal = new bootstrap.Modal(document.getElementById('successModal'));
+    modal.show();
+    this.reset();
+    selectedType = '';
+  } else {
+      const msg = (data && data.message)
+              ? data.message
+              : (response && response.status ? ('Error ' + response.status + ' ' + response.statusText) : 'Unknown error');
+      alert('Error: ' + msg);
+
+  }
+  } catch(err){
+    console.error('Submission error:', err);
+    alert('Something went wrong while submitting the report.');
+  }
+  });
+
+
+// Load profile modal
+  async function loadProfile(){
+    try {
+      const res = await fetch('/profile/data');
+      const data = await res.json();
+      document.getElementById('profileUsername').innerText = data.username;
+      document.getElementById('profileEmail').innerText = data.email;
+      document.getElementById('profilePhone').innerText = data.phone;
+    } catch(err){
+      console.error(err);
+      alert('Cannot load profile info.');
+    }
+  }
+
+  // Update password
+  document.getElementById('updatePasswordForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    if (!newPassword) return alert('Password cannot be empty.');
+
+    const data = new URLSearchParams();
+    data.append('newPassword', newPassword);
+
+    try {
+      const res = await fetch('/profile/update-password', {
+        method: 'POST',
+        body: data,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+      const msg = await res.text();
+      document.getElementById('updateMessage').innerText = msg;
+      document.getElementById('updateMessage').className = msg.toLowerCase().includes("success") ? 'mt-2 text-success' : 'mt-2 text-danger';
+      document.getElementById('newPassword').value = '';
+    } catch(err) {
+      console.error('Password update error:', err);
+      document.getElementById('updateMessage').innerText = 'Error updating password.';
+      document.getElementById('updateMessage').className = 'mt-2 text-danger';
+    }
+  });
+  // --- Select Lost or Found ---
+  document.getElementById('lostBtn').addEventListener('click', function() {
+    selectedType = 'lost';
+    this.classList.add('active');
+    document.getElementById('foundBtn').classList.remove('active');
+    alert('Lost Item Selected');
+  });
+
+  document.getElementById('foundBtn').addEventListener('click', function() {
+    selectedType = 'found';
+    this.classList.add('active');
+    document.getElementById('lostBtn').classList.remove('active');
+    alert('Found Item Selected');
+  });
+
+</script>
+</body>
+
+</html>

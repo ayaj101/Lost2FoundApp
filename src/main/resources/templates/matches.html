@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matches - Lost & Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; }
+    footer { margin-top: auto; }
+    .card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <img src="/images/logo.png" alt="Logo" width="220" height="40">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/index">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/report">Report</a></li>
+        <li class="nav-item"><a class="nav-link" href="/search">Search</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/matches">Matches</a></li>
+
+        <!-- Profile Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="/images/Profile.png" alt="Profile" width="30" height="30" class="rounded-circle">
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="loadProfile()">My Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="/logout" id="logoutBtn">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileModalLabel">My Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div id="profileDetails">
+          <p><strong>Username:</strong> <span id="profileUsername"></span></p>
+          <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+          <p><strong>Phone:</strong> <span id="profilePhone"></span></p>
+        </div>
+        <hr>
+        <h6>Update Password</h6>
+        <form id="updatePasswordForm">
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">New Password</label>
+            <input type="password" class="form-control" id="newPassword" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </form>
+        <div id="updateMessage" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<main class="container my-5">
+  <h2 class="text-center mb-4">Possible Matches</h2>
+
+  <!-- No matches message -->
+  <div th:if="${#lists.isEmpty(matches)}" class="alert alert-info text-center">
+    No matches found yet.
+  </div>
+
+  <!-- Matches list -->
+  <div class="row g-4" th:each="match : ${matches}">
+    <div class="col-md-6">
+      <div class="card p-3 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title" th:text="${match.lostItem.title} + ' ↔ ' + ${match.foundItem.title}">Item pair</h5>
+
+          <p><strong>Lost by:</strong> <span th:text="${match.lostItem.user.username}"></span></p>
+          <p><strong>Found by:</strong> <span th:text="${match.foundItem.user.username}"></span></p>
+
+          <p><strong>Location:</strong>
+            <span th:text="${match.lostItem.location}"></span> /
+            <span th:text="${match.foundItem.location}"></span>
+          </p>
+
+          <p>
+            <strong>Similarity:</strong>
+            <span th:text="${#numbers.formatDecimal(match.similarityScore,1,2)}"></span>
+          </p>
+
+          <!-- ======================= MATCH LOGIC (UPDATED) ======================= -->
+
+          <!-- 1️⃣ Manual Verified -->
+          <div th:if="${match.userConfirmed}">
+            <span class="badge bg-success">User Manual Verified</span>
+          </div>
+
+          <!-- 2️⃣ Auto Verified (score ≥ 0.8 and no manual verification) -->
+          <div th:if="${match.autoVerified and !match.userConfirmed}">
+            <span class="badge bg-primary">Auto Verified</span>
+          </div>
+
+          <!-- 3️⃣ Pending Manual Verification -->
+          <div th:if="${match.needsUserVerification}">
+            <span class="badge bg-warning text-dark">Pending - Needs User Confirmation</span>
+            <button class="btn btn-outline-success btn-sm mt-2"
+                    th:onclick="'confirmMatch(' + ${match.matchId} + ')'">
+              Confirm Match
+            </button>
+          </div>
+
+          <!-- 4️⃣ Very Low Score -->
+          <div th:if="${match.similarityScore < 0.6}">
+            <span class="badge bg-danger">Low Match Score</span>
+          </div>
+
+          <!-- ======================= END MATCH LOGIC ======================= -->
+
+
+          <div class="mt-3">
+            <button class="btn btn-outline-primary btn-sm"
+                    th:onclick="'showUserInfo(' + ${match.lostItem.user.id} + ', \'Owner\')'">Owner</button>
+            <button class="btn btn-outline-secondary btn-sm"
+                    th:onclick="'showUserInfo(' + ${match.foundItem.user.id} + ', \'Finder\')'">Finder</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Info Modal -->
+  <div class="modal fade" id="userInfoModal" tabindex="-1" aria-labelledby="userInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userInfoModalLabel">User Information</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Role:</strong> <span id="userRole"></span></p>
+          <p><strong>User ID:</strong> <span id="userId"></span></p>
+          <p><strong>Email:</strong> <span id="userEmail"></span></p>
+          <p><strong>Mobile:</strong> <span id="userPhone"></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="bg-dark text-light text-center py-3">
+  <p>© 2025 Lost & Found</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  function loadProfile() {
+    fetch('/profile/data')
+            .then(res => res.json())
+            .then(data => {
+              document.getElementById('profileUsername').innerText = data.username;
+              document.getElementById('profileEmail').innerText = data.email;
+              document.getElementById('profilePhone').innerText = data.phone;
+            });
+  }
+
+  document.getElementById('updatePasswordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const messageBox = document.getElementById('updateMessage');
+
+    if (!newPassword) {
+      messageBox.innerText = "Password cannot be empty.";
+      messageBox.className = "mt-2 text-danger";
+      return;
+    }
+
+    fetch('/profile/update-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ newPassword })
+    })
+            .then(res => res.text())
+            .then(msg => {
+              messageBox.innerText = msg;
+              messageBox.className = msg.toLowerCase().includes("success")
+                      ? "mt-2 text-success"
+                      : "mt-2 text-danger";
+            });
+  });
+
+  function showUserInfo(userId, role) {
+    fetch(`/matches/user/info/${userId}`)
+            .then(res => res.json())
+            .then(data => {
+              document.getElementById('userRole').innerText = role;
+              document.getElementById('userId').innerText = data.id;
+              document.getElementById('userEmail').innerText = data.email;
+              document.getElementById('userPhone').innerText = data.phone;
+              const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('userInfoModal'));
+              modal.show();
+            });
+  }
+
+  function confirmMatch(matchId) {
+    fetch(`/matches/confirm/${matchId}`, { method: 'POST' })
+            .then(res => res.text())
+            .then(msg => {
+              alert(msg);
+              location.reload();
+            });
+  }
+</script>
+
+</body>
+</html>
