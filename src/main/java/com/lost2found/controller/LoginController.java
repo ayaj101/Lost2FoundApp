@@ -38,7 +38,7 @@ public class LoginController {
         if (optionalUser.isPresent() && passwordEncoder.matches(password, optionalUser.get().getPassword())
         ) {
             // Successful login → redirect to index.html
-            return "/index";
+            return "redirect:/index";
         } else {
             // Login failed → show error message on login page
             model.addAttribute("error", "Invalid username or password!");
