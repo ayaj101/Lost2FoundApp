@@ -19,32 +19,7 @@ public class LoginController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Show login page
-    @GetMapping("/login")
-    public String loginPage() {
-        return "Login"; // Login.html in templates folder
-    }
 
-    // Handle login form submission
-    @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password,
-                        Model model) {
-
-        // Retrieve user from DB using Optional
-        Optional<User> optionalUser = userRepository.findByUsernameIgnoreCase(username);
-
-        // Check if user exists and password matches
-        if (optionalUser.isPresent() && passwordEncoder.matches(password, optionalUser.get().getPassword())
-        ) {
-            // Successful login → redirect to index.html
-            return "redirect:/index";
-        } else {
-            // Login failed → show error message on login page
-            model.addAttribute("error", "Invalid username or password!");
-            return "Login";
-        }
-    }
 
 
 }
