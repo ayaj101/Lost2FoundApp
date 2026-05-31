@@ -19,7 +19,10 @@ public class LoginController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
 
 
 }
