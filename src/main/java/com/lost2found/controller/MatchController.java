@@ -6,16 +6,18 @@ import com.lost2found.model.Match;
 import com.lost2found.model.User;
 import com.lost2found.repository.FoundItemRepository;
 import com.lost2found.repository.LostItemRepository;
-import com.lost2found.repository.MatchRepository;
 import com.lost2found.repository.UserRepository;
 import com.lost2found.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/matches")
@@ -33,12 +35,12 @@ public class MatchController {
     @Autowired
     private FoundItemRepository foundItemRepo;
 
-    @Autowired
-    private MatchRepository matchRepository;
-
     // Show matches for a specific FoundItem
     @GetMapping("/found/{id}")
-    public String getMatchesForFound(@PathVariable("id") Long foundId, Model model) {
+    public String getMatchesForFound(@PathVariable("id") Long foundId, Model model, Principal principal) {
+        FoundItem found = foundItemRepo.findById(foundId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        requireOwner(found.getUser(), principal);
         List<Match> matches = matchService.getMatchesForFoundItem(foundId);
         model.addAttribute("matches", matches);
         return "matches";
@@ -46,7 +48,10 @@ public class MatchController {
 
     // Show matches for a specific LostItem
     @GetMapping("/lost/{id}")
-    public String getMatchesForLost(@PathVariable("id") Long lostId, Model model) {
+    public String getMatchesForLost(@PathVariable("id") Long lostId, Model model, Principal principal) {
+        LostItem lost = lostItemRepo.findById(lostId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        requireOwner(lost.getUser(), principal);
         List<Match> matches = matchService.getMatchesForLostItem(lostId);
         model.addAttribute("matches", matches);
         return "matches";
@@ -54,21 +59,27 @@ public class MatchController {
 
     // View all matches
     @GetMapping
-    public String viewAllMatches(Model model) {
-        List<Match> matches = matchService.getAllMatches();
+    public String viewAllMatches(Model model, Principal principal) {
+        User user = currentUser(principal);
+        List<Match> matches = matchService.getMatchesForUser(user);
         model.addAttribute("matches", matches);
         return "matches";
     }
 
     // Save a match (used for manual creation)
     @PostMapping("/save")
-    public String saveMatch(@ModelAttribute Match match) {
+    public String saveMatch(@ModelAttribute Match match, Principal principal) {
         // Ensure LostItem and FoundItem exist
         Optional<LostItem> lostOpt = lostItemRepo.findById(match.getLostItem().getLostId());
         Optional<FoundItem> foundOpt = foundItemRepo.findById(match.getFoundItem().getFoundId());
 
         if (lostOpt.isEmpty() || foundOpt.isEmpty()) {
             return "redirect:/matches?error=invalidItems";
+        }
+        User user = currentUser(principal);
+        if (!lostOpt.get().getUser().getId().equals(user.getId())
+                && !foundOpt.get().getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         match.setLostItem(lostOpt.get());
@@ -81,10 +92,19 @@ public class MatchController {
     // Fetch user info for modal popup
     @GetMapping("/user/info/{id}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getUserInfo(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> getUserInfo(@PathVariable Long id, Principal principal) {
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
+        }
+
+        User currentUser = currentUser(principal);
+        boolean relatedToCurrentUser = id.equals(currentUser.getId())
+                || matchService.getMatchesForUser(currentUser).stream().anyMatch(match ->
+                match.getLostItem().getUser().getId().equals(id)
+                        || match.getFoundItem().getUser().getId().equals(id));
+        if (!relatedToCurrentUser) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         User user = userOpt.get();
@@ -97,7 +117,7 @@ public class MatchController {
 
     @PostMapping("/confirm/{id}")
     @ResponseBody
-    public ResponseEntity<String> confirmMatch(@PathVariable Long id) {
+    public ResponseEntity<String> confirmMatch(@PathVariable Long id, Principal principal) {
 
         Optional<Match> matchOpt = matchService.getMatchById(id);
 
@@ -106,6 +126,11 @@ public class MatchController {
         }
 
         Match match = matchOpt.get();
+        User user = currentUser(principal);
+        if (!match.getLostItem().getUser().getId().equals(user.getId())
+                && !match.getFoundItem().getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
 
         // If already verified
         if (!match.isNeedsUserVerification()) {
@@ -136,6 +161,20 @@ public class MatchController {
         matchService.saveMatch(match);
 
         return ResponseEntity.ok("✅ Match manually verified successfully!");
+    }
+
+    private User currentUser(Principal principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+        return userRepository.findByUsernameIgnoreCase(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+    }
+
+    private void requireOwner(User owner, Principal principal) {
+        if (!owner.getId().equals(currentUser(principal).getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 
 

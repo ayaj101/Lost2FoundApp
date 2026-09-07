@@ -94,23 +94,33 @@ public class ItemController {
 
     // --- Delete items safely (no changes here) ---
     @DeleteMapping("/delete/{type}/{id}")
-    public String deleteItem(@PathVariable String type, @PathVariable Long id) {
+    public ResponseEntity<String> deleteItem(
+            @PathVariable String type,
+            @PathVariable Long id,
+            Principal principal) {
+        Optional<User> currentUser = userRepository.findByUsernameIgnoreCase(principal.getName());
+        if (currentUser.isEmpty()) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
         if (type.equalsIgnoreCase("lost")) {
             return lostItemRepo.findById(id)
+                    .filter(item -> item.getUser().getId().equals(currentUser.get().getId()))
                     .map(item -> {
                         lostItemRepo.delete(item);
-                        return "Lost item deleted successfully";
+                        return ResponseEntity.ok("Lost item deleted successfully");
                     })
-                    .orElse("Lost item not found");
+                    .orElseGet(() -> ResponseEntity.status(404).body("Lost item not found"));
         } else if (type.equalsIgnoreCase("found")) {
             return foundItemRepo.findById(id)
+                    .filter(item -> item.getUser().getId().equals(currentUser.get().getId()))
                     .map(item -> {
                         foundItemRepo.delete(item);
-                        return "Found item deleted successfully";
+                        return ResponseEntity.ok("Found item deleted successfully");
                     })
-                    .orElse("Found item not found");
+                    .orElseGet(() -> ResponseEntity.status(404).body("Found item not found"));
         } else {
-            return "Invalid type";
+            return ResponseEntity.badRequest().body("Invalid type");
         }
     }
 }

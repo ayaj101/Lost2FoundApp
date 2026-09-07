@@ -13,9 +13,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/items")
@@ -36,6 +43,8 @@ public class ReportController {
     private final String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of("jpg", "jpeg", "png", "webp");
 
     // ------------------ LOST ITEM ------------------
     // ------------------ LOST ITEM ------------------
@@ -46,21 +55,12 @@ public class ReportController {
             @RequestParam String description,
             @RequestParam String location,
             @RequestParam(required = false) String event_date,
-            @RequestParam(required = false) MultipartFile image
+            @RequestParam(required = false) MultipartFile image,
+            Principal principal
     ) {
         try {
-            User user = userRepo.findById(user_id)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + user_id));
-
-            if (!new File(uploadDir).exists()) new File(uploadDir).mkdirs();
-
-            String filePath = null;
-            if (image != null && !image.isEmpty()) {
-                String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-                File dest = new File(uploadDir, fileName);
-                image.transferTo(dest);
-                filePath = "/uploads/" + fileName;
-            }
+            User user = getAuthenticatedUser(principal, user_id);
+            String filePath = saveImage(image);
 
             LostItem item = new LostItem();
             item.setUser(user);
@@ -87,9 +87,9 @@ public class ReportController {
             }
 
             return ResponseEntity.ok(Map.of("success", true, "message", "Lost item reported successfully!"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        } catch (RuntimeException | IOException e) {
+            String message = e.getMessage() == null ? "Unable to save lost item" : e.getMessage();
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", message));
         }
     }
 
@@ -102,21 +102,12 @@ public class ReportController {
             @RequestParam String description,
             @RequestParam String location,
             @RequestParam String event_date,
-            @RequestParam(required = false) MultipartFile image
+            @RequestParam(required = false) MultipartFile image,
+            Principal principal
     ) {
         try {
-            User user = userRepo.findById(user_id)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + user_id));
-
-            if (!new File(uploadDir).exists()) new File(uploadDir).mkdirs();
-
-            String filePath = null;
-            if (image != null && !image.isEmpty()) {
-                String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-                File dest = new File(uploadDir, fileName);
-                image.transferTo(dest);
-                filePath = "/uploads/" + fileName;
-            }
+            User user = getAuthenticatedUser(principal, user_id);
+            String filePath = saveImage(image);
 
             FoundItem item = new FoundItem();
             item.setUser(user);
@@ -138,19 +129,17 @@ public class ReportController {
             }
 
             return ResponseEntity.ok(Map.of("success", true, "message", "Found item reported successfully!"));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RuntimeException | IOException e) {
             String msg = (e.getMessage() != null && !e.getMessage().isEmpty()) ? e.getMessage() : ("Server error: " + e.getClass().getSimpleName());
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", msg));
         }
     }
 
     // Add this in ReportController.java
     @GetMapping("/user/matches")
-    public ResponseEntity<?> getUserMatches(@RequestParam Long user_id) {
+    public ResponseEntity<?> getUserMatches(@RequestParam Long user_id, Principal principal) {
         try {
-            User user = userRepo.findById(user_id)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + user_id));
+            User user = getAuthenticatedUser(principal, user_id);
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -162,6 +151,47 @@ public class ReportController {
                     "message", e.getMessage()
             ));
         }
+    }
+
+    private User getAuthenticatedUser(Principal principal, Long requestedUserId) {
+        if (principal == null) {
+            throw new IllegalArgumentException("Authentication required");
+        }
+
+        User user = userRepo.findByUsernameIgnoreCase(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found"));
+        if (!user.getId().equals(requestedUserId)) {
+            throw new IllegalArgumentException("You can only modify your own reports");
+        }
+        return user;
+    }
+
+    private String saveImage(MultipartFile image) throws IOException {
+        if (image == null || image.isEmpty()) {
+            return null;
+        }
+        if (image.getSize() > MAX_IMAGE_SIZE) {
+            throw new IllegalArgumentException("Image must be 5 MB or smaller");
+        }
+
+        String originalName = image.getOriginalFilename();
+        String extension = "";
+        if (originalName != null && originalName.lastIndexOf('.') >= 0) {
+            extension = originalName.substring(originalName.lastIndexOf('.') + 1).toLowerCase();
+        }
+        if (!ALLOWED_IMAGE_TYPES.contains(extension)) {
+            throw new IllegalArgumentException("Only JPG, PNG, and WEBP images are allowed");
+        }
+
+        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Files.createDirectories(uploadPath);
+        String fileName = UUID.randomUUID() + "." + extension;
+        Path destination = uploadPath.resolve(fileName).normalize();
+        if (!destination.startsWith(uploadPath)) {
+            throw new IllegalArgumentException("Invalid image path");
+        }
+        Files.copy(image.getInputStream(), destination);
+        return "/uploads/" + fileName;
     }
 
 }

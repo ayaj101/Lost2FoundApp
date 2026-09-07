@@ -7,7 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @RestController
 @RequestMapping("/forgot-password")
@@ -22,7 +26,10 @@ public class ForgotPasswordController {
     @Autowired
     private EmailService emailService;
 
-    private Map<String, String> otpMap = new HashMap<>();
+    private static final int MAX_OTP_ATTEMPTS = 5;
+    private static final long OTP_VALIDITY_SECONDS = 600;
+    private final SecureRandom secureRandom = new SecureRandom();
+    private final ConcurrentMap<String, OtpEntry> otpMap = new ConcurrentHashMap<>();
 
 
     @GetMapping("/send-otp/{username}")
@@ -44,8 +51,8 @@ public class ForgotPasswordController {
         }
 
         // ✅ Generate OTP
-        String otp = String.format("%06d", new Random().nextInt(999999));
-        otpMap.put(username.toLowerCase(), otp);
+        String otp = String.format("%06d", secureRandom.nextInt(1_000_000));
+        otpMap.put(username.toLowerCase(), new OtpEntry(otp, Instant.now().plusSeconds(OTP_VALIDITY_SECONDS), 0));
 
         User user = userOpt.get();
         String email = user.getEmail();
@@ -62,8 +69,15 @@ public class ForgotPasswordController {
                                 @RequestParam String newPassword) {
         username = username.trim();
 
-        String savedOtp = otpMap.get(username.toLowerCase());
-        if (savedOtp == null || !savedOtp.equals(otp)) {
+        String normalizedUsername = username.toLowerCase();
+        OtpEntry entry = otpMap.get(normalizedUsername);
+        if (entry == null || Instant.now().isAfter(entry.expiresAt())
+                || entry.attempts() >= MAX_OTP_ATTEMPTS) {
+            otpMap.remove(normalizedUsername);
+            return "invalid_otp";
+        }
+        if (!entry.otp().equals(otp)) {
+            otpMap.put(normalizedUsername, new OtpEntry(entry.otp(), entry.expiresAt(), entry.attempts() + 1));
             return "invalid_otp";
         }
 
@@ -76,8 +90,10 @@ public class ForgotPasswordController {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        otpMap.remove(username.toLowerCase());
+        otpMap.remove(normalizedUsername);
         System.out.println("✅ Password reset successful for " + username);
         return "success";
     }
+
+    private record OtpEntry(String otp, Instant expiresAt, int attempts) {}
 }

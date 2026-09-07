@@ -45,26 +45,23 @@ CREATE TABLE IF NOT EXISTS found_items (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
-select * from users;
-select * from lost_items;
-select * from found_items;
-Select * from matches;
-select * from notifications;
-
-DROP TABLE IF EXISTS matches;
-CREATE TABLE matches (
+CREATE TABLE IF NOT EXISTS matches (
     match_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     lost_id BIGINT NOT NULL,
     found_id BIGINT NOT NULL,
     score DECIMAL(5,4) NOT NULL,
+    auto_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    needs_user_verification BOOLEAN NOT NULL DEFAULT FALSE,
+    user_confirmed BOOLEAN NOT NULL DEFAULT FALSE,
     matched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    admin_verified TINYINT(1) DEFAULT 0,
+    system_note TEXT,
+    status VARCHAR(30),
     FOREIGN KEY (lost_id) REFERENCES lost_items(lost_id) ON DELETE CASCADE,
     FOREIGN KEY (found_id) REFERENCES found_items(found_id) ON DELETE CASCADE
 );
 
 -- NOTIFICATIONS TABLE (Optional)
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     notif_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     message TEXT,
@@ -88,3 +85,12 @@ ALTER TABLE found_items MODIFY auto_desc_emb LONGTEXT;
 
 DESCRIBE matches;
 DESC users;
+
+
+SELECT DATABASE();
+SELECT @@hostname;
+
+SELECT COUNT(*) FROM users;
+SELECT COUNT(*) FROM lost_items;
+SELECT COUNT(*) FROM found_items;
+SELECT COUNT(*) FROM matches;
