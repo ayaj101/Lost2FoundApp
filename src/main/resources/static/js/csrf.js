@@ -13,7 +13,7 @@
     if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
       const headers = new Headers(options.headers || {});
       const token = readCookie("XSRF-TOKEN");
-      if (token) headers.set("X-XSRF-TOKEN", token);
+      if (token && !headers.has("X-XSRF-TOKEN")) headers.set("X-XSRF-TOKEN", token);
       options.headers = headers;
     }
     return originalFetch(input, options);

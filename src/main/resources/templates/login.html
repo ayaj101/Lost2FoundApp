@@ -130,7 +130,7 @@
             }
 
             // Call Spring Boot API to send OTP
-            fetch(`http://localhost:8080/forgot-password/send-otp/${encodeURIComponent(username)}`)
+            fetch(`/forgot-password/send-otp/${encodeURIComponent(username)}`)
 
 
                     .then(res => res.text())
