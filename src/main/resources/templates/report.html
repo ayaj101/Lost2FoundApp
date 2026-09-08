@@ -193,9 +193,14 @@
 
     const formData = new FormData(this);
     const endpoint = selectedType === 'lost' ? '/api/items/report/lost' : '/api/items/report/found';
+    const csrfToken = this.querySelector('input[name="_csrf"]')?.value;
 
     try {
-    const response = await fetch(endpoint, { method: 'POST', body: formData });
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      body: formData,
+      headers: csrfToken ? { 'X-XSRF-TOKEN': csrfToken } : {}
+    });
 
     // handle JSON success or HTML error gracefully
     const contentType = response.headers.get('content-type') || '';
