@@ -71,6 +71,7 @@
   <form id="reportForm" class="row g-3 shadow p-4 rounded bg-light" enctype="multipart/form-data">
     <!-- Hidden user_id input -->
     <input type="hidden" name="user_id" id="user_id">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
     <div class="col-md-6">
       <label class="form-label">Item Title</label>
