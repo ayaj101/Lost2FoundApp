@@ -3,6 +3,7 @@ package com.lost2found.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,19 +13,25 @@ public class EmailService {
     private JavaMailSender mailSender;
 
     // ⭐ NEW → OTP EMAIL SENDING SUPPORT
-    public void sendOtpEmail(String toEmail, String otp) {
+    public boolean sendOtpEmail(String toEmail, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Lost2Found - Password Reset OTP");
         message.setText("Your OTP for password reset is: " + otp + "\n\n"
                 + "This OTP is valid for 10 minutes.");
 
-        mailSender.send(message);
-        System.out.println("📧 OTP Email sent to: " + toEmail);
+        try {
+            mailSender.send(message);
+            System.out.println("📧 OTP Email sent to: " + toEmail);
+            return true;
+        } catch (MailException ex) {
+            System.err.println("⚠️ OTP email could not be sent: " + ex.getMessage());
+            return false;
+        }
     }
 
     // ⭐ Optional: For match notifications
-    public void sendMatchNotification(String toEmail, String lostTitle, String foundTitle, String type) {
+    public boolean sendMatchNotification(String toEmail, String lostTitle, String foundTitle, String type) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Lost2Found - " + type);
@@ -37,7 +44,13 @@ public class EmailService {
                         "Please login to view more details."
         );
 
-        mailSender.send(message);
-        System.out.println("📧 Match Email sent to: " + toEmail);
+        try {
+            mailSender.send(message);
+            System.out.println("📧 Match Email sent to: " + toEmail);
+            return true;
+        } catch (MailException ex) {
+            System.err.println("⚠️ Match email could not be sent: " + ex.getMessage());
+            return false;
+        }
     }
 }

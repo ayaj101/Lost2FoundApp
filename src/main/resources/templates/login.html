@@ -141,6 +141,9 @@
                         otpSection.classList.remove('hidden');
                         actionBtn.textContent = "Reset Password";
                         otpSent = true;
+                    } else if (result === "email_failed") {
+                        msg.textContent = "OTP could not be sent. Email service is temporarily unavailable.";
+                        msg.classList.remove('success');
                     } else {
                         msg.textContent = "User not registered. Please register first!";
                         msg.classList.remove('success');

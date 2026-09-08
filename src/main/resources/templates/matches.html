@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <meta name="_csrf" th:content="${_csrf.token}">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Matches - Lost & Found</title>
@@ -93,7 +94,7 @@
     <div class="col-md-6">
       <div class="card p-3 shadow-sm">
         <div class="card-body">
-          <h5 class="card-title" th:text="${match.lostItem.title} + ' ↔ ' + ${match.foundItem.title}">Item pair</h5>
+          <h5 class="card-title" th:text="|${match.lostItem.title} ↔ ${match.foundItem.title}|">Item pair</h5>
 
           <p><strong>Lost by:</strong> <span th:text="${match.lostItem.user.username}"></span></p>
           <p><strong>Found by:</strong> <span th:text="${match.foundItem.user.username}"></span></p>

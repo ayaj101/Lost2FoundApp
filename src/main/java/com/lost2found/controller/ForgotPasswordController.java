@@ -57,7 +57,10 @@ public class ForgotPasswordController {
         User user = userOpt.get();
         String email = user.getEmail();
 
-        emailService.sendOtpEmail(email, otp);
+        if (!emailService.sendOtpEmail(email, otp)) {
+            otpMap.remove(username.toLowerCase());
+            return "email_failed";
+        }
         System.out.println("✅ OTP sent to: " + email);
 
         return "exists";

@@ -7,12 +7,16 @@
     return cookie ? decodeURIComponent(cookie.substring(prefix.length)) : null;
   }
 
+  function readMetaToken() {
+    return document.querySelector('meta[name="_csrf"]')?.content || null;
+  }
+
   window.fetch = function (input, init) {
     const options = init ? { ...init } : {};
     const method = (options.method || "GET").toUpperCase();
     if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
       const headers = new Headers(options.headers || {});
-      const token = readCookie("XSRF-TOKEN");
+      const token = readCookie("XSRF-TOKEN") || readMetaToken();
       if (token && !headers.has("X-XSRF-TOKEN")) headers.set("X-XSRF-TOKEN", token);
       options.headers = headers;
     }
