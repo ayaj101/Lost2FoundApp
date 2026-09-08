@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}">
   <title>Title</title>
 </head>
 <body>
@@ -133,6 +134,20 @@
   </div>
 </section>
 
+<section class="container" th:if="${notifications != null and !#lists.isEmpty(notifications)}">
+  <div class="alert alert-warning shadow-sm" th:each="notification : ${notifications}" th:id="|notification-${notification.id}|">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <strong th:text="${notification.message}">Your lost item is found. Please check Matches.</strong>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary btn-sm"
+                th:onclick="|openMatchNotification(${notification.id})|">See Matches</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm"
+                th:onclick="|ignoreMatchNotification(${notification.id})|">Ignore</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Recent Items -->
 <section class="container my-5">
   <h2 class="text-center mb-4">Recently Reported Items</h2>
@@ -192,6 +207,20 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/csrf.js"></script>
 <script>
+  function markNotification(notificationId) {
+    return fetch(`/notifications/${notificationId}/read`, { method: 'POST' });
+  }
+
+  function openMatchNotification(notificationId) {
+    markNotification(notificationId).finally(() => window.location.href = '/matches');
+  }
+
+  function ignoreMatchNotification(notificationId) {
+    markNotification(notificationId).then(() => {
+      document.getElementById(`notification-${notificationId}`)?.remove();
+    });
+  }
+
   function loadProfile() {
     fetch('/profile/data')
             .then(response => response.json())

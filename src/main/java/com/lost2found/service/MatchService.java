@@ -31,6 +31,12 @@ public class MatchService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private SmsService smsService;
+
+    @Autowired
+    private NotificationService notificationService;
+
     // ---------------- EXISTING METHODS ----------------
 
     public List<Match> getMatchesForFoundItem(Long foundId) {
@@ -106,6 +112,7 @@ public class MatchService {
                         "🎯 Auto-verified match found for your lost item: " + lost.getTitle());
                 notifyUser(found.getUser(),
                         "🎯 Your found item matched automatically with: " + lost.getTitle());
+                notifyMatchedUsers(lost, found, "Your lost item is found: " + lost.getTitle());
 
                 // ⭐ NEW — Email Notification
                 emailService.sendMatchNotification(
@@ -136,6 +143,7 @@ public class MatchService {
                         "⚠️ Possible match found for your lost item: " + lost.getTitle());
                 notifyUser(found.getUser(),
                         "⚠️ Your found item might match: " + lost.getTitle());
+                notifyMatchedUsers(lost, found, "A possible match was found for: " + lost.getTitle());
 
                 // ⭐ NEW — Email Notification (Manual Verification)
                 emailService.sendMatchNotification(
@@ -212,6 +220,7 @@ public class MatchService {
 
                 notifyUser(lost.getUser(), "🎯 Auto-verified match found for your lost item.");
                 notifyUser(found.getUser(), "🎯 Your found item automatically matched with a lost report.");
+                notifyMatchedUsers(lost, found, "Your lost item is found: " + lost.getTitle());
 
                 // ⭐ Email Notifications
                 emailService.sendMatchNotification(
@@ -236,6 +245,7 @@ public class MatchService {
 
                 notifyUser(lost.getUser(), "⚠️ Possible match found for your lost item. Please review.");
                 notifyUser(found.getUser(), "⚠️ Your found item might match someone's lost item. Please confirm.");
+                notifyMatchedUsers(lost, found, "A possible match was found for: " + lost.getTitle());
 
                 // ⭐ Email Notifications
                 emailService.sendMatchNotification(
@@ -290,6 +300,13 @@ public class MatchService {
 
     private void notifyUser(User user, String message) {
         System.out.println("🔔 Notify " + user.getUsername() + ": " + message);
+    }
+
+    private void notifyMatchedUsers(LostItem lost, FoundItem found, String message) {
+        notificationService.createMatchNotification(lost.getUser(), message);
+        notificationService.createMatchNotification(found.getUser(), message);
+        smsService.sendMatchSms(lost.getUser().getPhone(), message);
+        smsService.sendMatchSms(found.getUser().getPhone(), message);
     }
 
     public List<Match> getMatchesForUser(User user) {

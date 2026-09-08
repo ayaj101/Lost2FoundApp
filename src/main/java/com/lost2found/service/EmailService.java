@@ -1,56 +1,68 @@
 package com.lost2found.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.MailException;
+import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+        @Value("${resend.api.key:}")
+        private String resendApiKey;
+
+        @Value("${resend.from:Lost2Found <onboarding@resend.dev>}")
+        private String resendFrom;
+
+        private final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .build();
 
     // ⭐ NEW → OTP EMAIL SENDING SUPPORT
     public boolean sendOtpEmail(String toEmail, String otp) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Lost2Found - Password Reset OTP");
-        message.setText("Your OTP for password reset is: " + otp + "\n\n"
-                + "This OTP is valid for 10 minutes.");
-
-        try {
-            mailSender.send(message);
-            System.out.println("📧 OTP Email sent to: " + toEmail);
-            return true;
-        } catch (MailException ex) {
-            System.err.println("⚠️ OTP email could not be sent: " + ex.getMessage());
-            return false;
-        }
+        return sendEmail(toEmail, "Lost2Found - Password Reset OTP",
+            "Your OTP for password reset is: " + otp + "\n\nThis OTP is valid for 10 minutes.");
     }
 
     // ⭐ Optional: For match notifications
     public boolean sendMatchNotification(String toEmail, String lostTitle, String foundTitle, String type) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Lost2Found - " + type);
+        return sendEmail(toEmail, "Lost2Found - " + type,
+                "A new match has been detected!\n\nLost Item: " + lostTitle +
+                        "\nFound Item: " + foundTitle + "\nMatch Type: " + type +
+                        "\n\nPlease login to view more details.");
+    }
 
-        message.setText(
-                "A new match has been detected!\n\n" +
-                        "Lost Item: " + lostTitle + "\n" +
-                        "Found Item: " + foundTitle + "\n" +
-                        "Match Type: " + type + "\n\n" +
-                        "Please login to view more details."
-        );
-
-        try {
-            mailSender.send(message);
-            System.out.println("📧 Match Email sent to: " + toEmail);
-            return true;
-        } catch (MailException ex) {
-            System.err.println("⚠️ Match email could not be sent: " + ex.getMessage());
+    private boolean sendEmail(String toEmail, String subject, String text) {
+        if (resendApiKey == null || resendApiKey.isBlank()) {
+            System.err.println("⚠️ RESEND_API_KEY is not configured");
             return false;
         }
+
+        String json = "{\"from\":\"" + escape(resendFrom) + "\",\"to\":[\"" +
+                escape(toEmail) + "\"],\"subject\":\"" + escape(subject) +
+                "\",\"text\":\"" + escape(text) + "\"}";
+        Request request = new Request.Builder()
+                .url("https://api.resend.com/emails")
+                .addHeader("Authorization", "Bearer " + resendApiKey)
+                .post(RequestBody.create(json, MediaType.parse("application/json")))
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                System.err.println("⚠️ Resend email failed: " + response.code());
+                return false;
+            }
+            return true;
+        } catch (IOException ex) {
+            System.err.println("⚠️ Resend email failed: " + ex.getMessage());
+            return false;
+        }
+    }
+
+    private String escape(String value) {
+        return value.replace("\\", "\\\\").replace("\"", "\\\"")
+                .replace("\n", "\\n").replace("\r", "\\r");
     }
 }
