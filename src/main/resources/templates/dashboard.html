@@ -97,6 +97,21 @@
 <div class="container py-4">
   <h2 class="mb-4 text-center">Dashboard</h2>
 
+  <div th:if="${notifications != null and !#lists.isEmpty(notifications)}">
+    <div class="alert alert-warning shadow-sm" th:each="notification : ${notifications}"
+         th:id="|notification-${notification.id}|">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <strong th:text="${notification.message}">A new match was found.</strong>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-primary btn-sm"
+                  th:onclick="|openMatchNotification(${notification.id})|">See Matches</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm"
+                  th:onclick="|ignoreMatchNotification(${notification.id})|">Ignore</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row mb-4">
     <div class="col-md-3">
       <div class="card text-white bg-danger mb-3 text-center">
@@ -197,6 +212,20 @@
 <script src="/js/csrf.js"></script>
 
 <script>
+  function markNotification(notificationId) {
+    return fetch(`/notifications/${notificationId}/read`, { method: 'POST' });
+  }
+
+  function openMatchNotification(notificationId) {
+    markNotification(notificationId).finally(() => window.location.href = '/matches');
+  }
+
+  function ignoreMatchNotification(notificationId) {
+    markNotification(notificationId).then(() => {
+      document.getElementById(`notification-${notificationId}`)?.remove();
+    });
+  }
+
   function loadProfile() {
     fetch('/profile/data')
             .then(response => response.json())

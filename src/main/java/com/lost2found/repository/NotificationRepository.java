@@ -1,9 +1,10 @@
 package com.lost2found.repository;
 
-import com.lost2found.model.Notification;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.lost2found.model.Notification;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     List<Notification> findByUserIdAndReadFalseOrderByCreatedAtDesc(Long userId);

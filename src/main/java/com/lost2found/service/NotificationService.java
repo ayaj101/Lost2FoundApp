@@ -1,12 +1,13 @@
 package com.lost2found.service;
 
-import com.lost2found.model.Notification;
-import com.lost2found.model.User;
-import com.lost2found.repository.NotificationRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.lost2found.model.Notification;
+import com.lost2found.model.User;
+import com.lost2found.repository.NotificationRepository;
 
 @Service
 public class NotificationService {
@@ -21,7 +22,9 @@ public class NotificationService {
         Notification notification = new Notification();
         notification.setUserId(user.getId());
         notification.setMessage(message);
-        repository.save(notification);
+        Notification saved = repository.saveAndFlush(notification);
+        System.out.println("🔔 In-app notification saved: id=" + saved.getId()
+            + ", userId=" + user.getId());
     }
 
     public List<Notification> unreadFor(User user) {

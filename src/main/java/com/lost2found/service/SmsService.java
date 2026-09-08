@@ -1,11 +1,17 @@
 package com.lost2found.service;
 
-import okhttp3.*;
+import java.io.IOException;
+import java.util.Base64;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.Base64;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 @Service
 public class SmsService {
@@ -44,7 +50,9 @@ public class SmsService {
                 .build();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                System.err.println("⚠️ Twilio SMS failed: " + response.code());
+                ResponseBody responseBodySource = response.body();
+                String responseBody = responseBodySource == null ? "" : responseBodySource.string();
+                System.err.println("⚠️ Twilio SMS failed: " + response.code() + " " + responseBody);
                 return false;
             }
             return true;

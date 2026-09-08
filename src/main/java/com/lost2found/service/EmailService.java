@@ -1,11 +1,17 @@
 package com.lost2found.service;
 
-import okhttp3.*;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 @Service
 public class EmailService {
@@ -51,7 +57,9 @@ public class EmailService {
                 .build();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                System.err.println("⚠️ Resend email failed: " + response.code());
+                ResponseBody body = response.body();
+                String responseBody = body == null ? "" : body.string();
+                System.err.println("⚠️ Resend email failed: " + response.code() + " " + responseBody);
                 return false;
             }
             return true;

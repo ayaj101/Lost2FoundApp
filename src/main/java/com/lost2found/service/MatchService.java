@@ -1,19 +1,20 @@
 package com.lost2found.service;
 
-import com.lost2found.model.Match;
-import com.lost2found.model.FoundItem;
-import com.lost2found.model.LostItem;
-import com.lost2found.model.User;
-import com.lost2found.repository.MatchRepository;
-import com.lost2found.repository.FoundItemRepository;
-import com.lost2found.repository.LostItemRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.lost2found.model.FoundItem;
+import com.lost2found.model.LostItem;
+import com.lost2found.model.Match;
+import com.lost2found.model.User;
+import com.lost2found.repository.FoundItemRepository;
+import com.lost2found.repository.LostItemRepository;
+import com.lost2found.repository.MatchRepository;
 
 @Service
 public class MatchService {
@@ -30,9 +31,6 @@ public class MatchService {
     // ⭐ NEW: Email Service added
     @Autowired
     private EmailService emailService;
-
-    @Autowired
-    private SmsService smsService;
 
     @Autowired
     private NotificationService notificationService;
@@ -305,8 +303,6 @@ public class MatchService {
     private void notifyMatchedUsers(LostItem lost, FoundItem found, String message) {
         notificationService.createMatchNotification(lost.getUser(), message);
         notificationService.createMatchNotification(found.getUser(), message);
-        smsService.sendMatchSms(lost.getUser().getPhone(), message);
-        smsService.sendMatchSms(found.getUser().getPhone(), message);
     }
 
     public List<Match> getMatchesForUser(User user) {

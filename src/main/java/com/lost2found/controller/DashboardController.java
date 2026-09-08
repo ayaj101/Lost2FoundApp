@@ -1,21 +1,22 @@
 package com.lost2found.controller;
 
-import com.lost2found.model.LostItem;
+import java.security.Principal;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import com.lost2found.model.FoundItem;
+import com.lost2found.model.LostItem;
 import com.lost2found.model.User;
 import com.lost2found.repository.FoundItemRepository;
 import com.lost2found.repository.LostItemRepository;
 import com.lost2found.repository.UserRepository;
 import com.lost2found.service.DashboardService;
 import com.lost2found.service.MatchService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import java.security.Principal;
-import java.util.List;
-import java.util.Optional;
+import com.lost2found.service.NotificationService;
 
 @Controller
 public class DashboardController {
@@ -34,6 +35,9 @@ public class DashboardController {
 
     @Autowired
     private MatchService matchService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/dashboard")
     public String showDashboard(Model model, Principal principal) {
@@ -70,6 +74,7 @@ public class DashboardController {
             // fetch items only for the logged-in user
             model.addAttribute("lostItems", dashboardService.getAllLostItemsByUser(userId));
             model.addAttribute("foundItems", dashboardService.getAllFoundItemsByUser(userId));
+            model.addAttribute("notifications", notificationService.unreadFor(user));
 
             return "dashboard";
         } catch (Exception e) {
